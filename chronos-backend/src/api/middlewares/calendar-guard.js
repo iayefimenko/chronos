@@ -19,6 +19,7 @@ async function calendarGuard(req, res, next) {
   );
   if (!me) return res.sendStatus(HttpStatus.FORBIDDEN);
   req.calendarMember = me;
+
   next();
 }
 

@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, model, default: mongoose } = require("mongoose");
 const { EVENT_TYPES } = require("../../config/constants");
 
 const EventModel = new Schema({

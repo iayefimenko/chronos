@@ -10,4 +10,8 @@ const UpdateCalendar = Joi.object({
   description: Joi.string().min(16).max(200),
 });
 
-module.exports = { CreateCalendar, UpdateCalendar };
+const InviteUser = Joi.object({
+  email: Joi.string().email().required(),
+});
+
+module.exports = { CreateCalendar, UpdateCalendar, InviteUser };

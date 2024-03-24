@@ -8,4 +8,7 @@ Password requirements:
 */
 const passwordRegex =
   /^(?=.*[A-Z])(?=.*[!@#$&%^_+=()\\\[\]{};:<>.,|?\-\/*])(?=.*[0-9])(?=.*[a-z]).{10,}$/m;
-module.exports = { passwordRegex };
+
+const colorRegex = /^#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})$/;
+
+module.exports = { passwordRegex, colorRegex };

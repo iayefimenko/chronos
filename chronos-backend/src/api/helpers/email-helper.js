@@ -5,6 +5,7 @@ const logger = require("../../config/logger");
 
 const VERIFY_EMAIL_TEMPLATE = "verify-email";
 const RESET_PASSWORD_TEMPLATE = "reset-password";
+const INVITE_TO_CALENDAR_TEMPLATE = "invite-to-calendar";
 
 const transporter = nodemailer.createTransport({
   service: "gmail",
@@ -47,4 +48,9 @@ async function sendEmail(to, subject, template, context) {
   }
 }
 
-module.exports = { sendEmail, VERIFY_EMAIL_TEMPLATE, RESET_PASSWORD_TEMPLATE };
+module.exports = {
+  sendEmail,
+  VERIFY_EMAIL_TEMPLATE,
+  RESET_PASSWORD_TEMPLATE,
+  INVITE_TO_CALENDAR_TEMPLATE,
+};
