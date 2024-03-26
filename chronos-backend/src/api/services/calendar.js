@@ -137,13 +137,15 @@ const deleteEvent = async (calendarId, eventId, calendarMember) => {
 };
 
 const getCalendar = async (calendarId, settings) => {
+  if (!settings.show) settings.show = [];
+
   try {
     const calendar = await Calendar.findById(calendarId)
       .populate({
         path: "events",
         match: {
           type: { $in: settings.show },
-          startAt: { $gte: settings.startDate, $lte: settings.endDate },
+          startAt: { $gte: settings.startAt, $lte: settings.endAt },
         },
       })
       .populate({

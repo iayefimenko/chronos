@@ -5,9 +5,6 @@ const mongoose = require("mongoose");
 const geoip = require("geoip-lite");
 const { getHolidaysByCountry } = require("../helpers/holiday-helper");
 const logger = require("../../config/logger");
-const {
-  parseShowEventsParams,
-} = require("../helpers/show-events-param-helper");
 
 const getMyCalendars = async (req, res, next) => {
   const calendars = await calendarService.getMyCalendars(req.userId);
@@ -99,11 +96,11 @@ const deleteEvent = async (req, res, next) => {
 
 const getEvents = async (req, res, next) => {
   try {
-    const events = await calendarService.getCalendar(
+    const calendarData = await calendarService.getCalendar(
       req.params.id,
-      parseShowEventsParams(req.query)
+      req.body
     );
-    return res.status(HttpStatus.OK).json({ events });
+    return res.status(HttpStatus.OK).json({ calendarData });
   } catch (err) {
     next(err);
   }

@@ -24,7 +24,12 @@ router.patch(
   calendarController.updateCalendar
 );
 
-router.get("/:id", calendarGuard, calendarController.getEvents);
+router.post(
+  "/:id/receive-events",
+  calendarGuard,
+  validate(cSchema.GetEvents),
+  calendarController.getEvents
+);
 
 //invite user to calendar
 router.post(
