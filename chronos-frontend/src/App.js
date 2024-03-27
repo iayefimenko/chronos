@@ -1,4 +1,4 @@
-import { Login, Welcome } from "./pages";
+import { Login, Welcome, Signup } from "./pages";
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import RequireAuth from "./components/RequireAuth";
@@ -12,6 +12,8 @@ const App = () => (
         <Route element={<RequireAuth />}>
           <Route path="/welcome" element={<Welcome />} />
         </Route>
+
+        <Route path="/signup" element={<Signup />} />
       </Routes>
     </BrowserRouter>
   </div>
