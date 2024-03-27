@@ -7,6 +7,9 @@ const App = () => (
   <div>
     <BrowserRouter>
       <Routes>
+        {/* to make signup page a starter one */}
+        <Route path="/" element={<Signup />} />
+
         <Route path="/login" element={<Login />} />
 
         <Route element={<RequireAuth />}>

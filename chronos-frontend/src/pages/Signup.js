@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { TextField, Button, Typography, Container, Grid } from "@mui/material";
+import { TextField, Button, Typography, Container, Grid, Link } from "@mui/material";
 
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
 import { useSignupMutation } from "../features/auth/authApiSlice";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 
-import "../forms.css";
+// import "../forms.css";
+import calendarGif from "../assets/calendar.gif";
 
 const Signup = () => {
   const [username, setUsername] = useState("");
@@ -33,61 +34,78 @@ const Signup = () => {
     }
   };
 
-  return (
+  const content = (
     <Container maxWidth="sm" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-      <Grid container justifyContent="center" alignItems="center" direction="column" className="form">
-        <Grid item>
-          <Typography variant="h4" align="center">Register</Typography>
+      <Grid container justifyContent="center" alignItems="center" className="form">
+        <Grid item style={{ marginRight: "20px" }}>
+          <img src={calendarGif} alt="Calendar" style={{ width: "300px" }} />
         </Grid>
         <Grid item>
-          <TextField
-            id="username"
-            label="Username"
-            type="text"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            id="email"
-            label="Email"
-            type="email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            id="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleSubmit}
-          >
-            Sign Up
-          </Button>
+          <Grid container direction="column">
+            <Grid item>
+              <Typography variant="h4" align="center">Register</Typography>
+            </Grid>
+            <Grid item>
+              <TextField
+                id="username"
+                label="Username"
+                type="text"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                id="email"
+                label="Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                id="password"
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmit}
+              >
+                Sign Up
+              </Button>
+            </Grid>
+            <Grid item>
+              <Typography variant="body1" align="center">
+                Already have an account?{" "}
+                <Link component={RouterLink} to="/login">
+                  Sign in
+                </Link>
+              </Typography>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Container>
   );
+
+  return content;
 };
 
 export default Signup;

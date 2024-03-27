@@ -7,7 +7,8 @@ import { useLoginMutation } from "../features/auth/authApiSlice";
 
 import { useNavigate } from "react-router-dom";
 
-import "../forms.css";
+// import "../forms.css";
+import calendarGif from "../assets/calendar.gif";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -33,49 +34,58 @@ const Login = () => {
     }
   };
 
-  return (
+  const content = (
     <Container maxWidth="sm" style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "100vh" }}>
-      <Grid container justifyContent="center" alignItems="center" direction="column" className="form">
-        <Grid item>
-          <Typography variant="h4" align="center">Login</Typography>
+      <Grid container justifyContent="center" alignItems="center" className="form">
+        <Grid item style={{ marginRight: "20px" }}>
+          <img src={calendarGif} alt="Calendar" style={{ width: "300px" }} />
         </Grid>
         <Grid item>
-          <TextField
-            id="email"
-            label="Email"
-            type="email"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <TextField
-            id="password"
-            label="Password"
-            type="password"
-            variant="outlined"
-            fullWidth
-            margin="normal"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </Grid>
-        <Grid item>
-          <Button
-            variant="contained"
-            color="primary"
-            fullWidth
-            onClick={handleSubmit}
-          >
-            Sign In
-          </Button>
+          <Grid container direction="column">
+            <Grid item>
+              <Typography variant="h4" align="center">Login</Typography>
+            </Grid>
+            <Grid item>
+              <TextField
+                id="email"
+                label="Email"
+                type="email"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+            </Grid>
+            <Grid item>
+              <TextField
+                id="password"
+                label="Password"
+                type="password"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="contained"
+                color="primary"
+                fullWidth
+                onClick={handleSubmit}
+              >
+                Sign In
+              </Button>
+            </Grid>
+          </Grid>
         </Grid>
       </Grid>
     </Container>
   );
+
+  return content;
 };
 
 export default Login;
