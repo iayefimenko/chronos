@@ -1,33 +1,40 @@
 import { useState } from "react";
-import { TextField, Button, Typography, Container, Grid } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Grid,
+  Link,
+} from "@mui/material";
 
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
-import { useLoginMutation } from "../features/auth/authApiSlice";
+import { useSignupMutation } from "../features/auth/authApiSlice";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link as RouterLink } from "react-router-dom";
 
 // import "../forms.css";
 import calendarGif from "../assets/calendar.gif";
 
-const Login = () => {
+const Signup = () => {
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const [login] = useLoginMutation();
+  const [signup] = useSignupMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-
     try {
-      const userData = await login({ email, password }).unwrap();
+      const userData = await signup({ username, email, password }).unwrap();
       console.log("User data", userData);
       dispatch(setCredentials({ ...userData }));
+      setUsername("");
       setEmail("");
       setPassword("");
-      navigate("/welcome");
+      navigate("/login");
     } catch (err) {
       // handle errors
       console.log(err);
@@ -57,8 +64,20 @@ const Login = () => {
           <Grid container direction="column">
             <Grid item>
               <Typography variant="h4" align="center">
-                Login
+                Register
               </Typography>
+            </Grid>
+            <Grid item>
+              <TextField
+                id="username"
+                label="Username"
+                type="text"
+                variant="outlined"
+                fullWidth
+                margin="normal"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+              />
             </Grid>
             <Grid item>
               <TextField
@@ -91,8 +110,16 @@ const Login = () => {
                 fullWidth
                 onClick={handleSubmit}
               >
-                Sign In
+                Sign Up
               </Button>
+            </Grid>
+            <Grid item>
+              <Typography variant="body1" align="center">
+                Already have an account?{" "}
+                <Link component={RouterLink} to="/login">
+                  Sign in
+                </Link>
+              </Typography>
             </Grid>
           </Grid>
         </Grid>
@@ -103,4 +130,4 @@ const Login = () => {
   return content;
 };
 
-export default Login;
+export default Signup;
