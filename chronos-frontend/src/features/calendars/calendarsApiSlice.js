@@ -12,8 +12,78 @@ export const calendarsApiSlice = apiSlice.injectEndpoints({
         body: { ...filter },
       }),
     }),
+
+    getCalendar: builder.mutation({
+      query: ({ calendarId }) => ({
+        url: `/calendars/${calendarId}`,
+        method: "GET",
+      }),
+    }),
+
+    updateCalendar: builder.mutation({
+      query: ({ calendarId, calendarData }) => ({
+        url: `/calendars/${calendarId}`,
+        method: "PATCH",
+        body: { ...calendarData },
+      }),
+    }),
+
+    createCalendar: builder.mutation({
+      query: ({ calendarData }) => ({
+        url: `/calendars`,
+        method: "POST",
+        body: { ...calendarData },
+      }),
+    }),
+
+    getAllHolidays: builder.mutation({
+      query: () => ({
+        url: `/calendars/holidays`,
+        method: "GET",
+      }),
+    }),
+
+    getEvent: builder.mutation({
+      query: ({ calendarId, eventId }) => ({
+        url: `/calendars/${calendarId}/event/${eventId}`,
+        method: "GET",
+      }),
+    }),
+
+    createEvent: builder.mutation({
+      query: ({ calendarId, eventData }) => ({
+        url: `/calendars/${calendarId}/event`,
+        method: "POST",
+        body: { ...eventData },
+      }),
+    }),
+
+    updateEvent: builder.mutation({
+      query: ({ calendarId, eventId, eventData }) => ({
+        url: `/calendars/${calendarId}/event/${eventId}`,
+        method: "PATCH",
+        body: { ...eventData },
+      }),
+    }),
+
+    deleteEvent: builder.mutation({
+      query: ({ calendarId, eventId }) => ({
+        url: `/calendars/${calendarId}/event/${eventId}`,
+        method: "DELETE",
+      }),
+    }),
   }),
 });
 
-export const { useGetCalendarsQuery, useGetCalendarDataWithFiltersMutation } =
-  calendarsApiSlice;
+export const {
+  useGetCalendarsQuery,
+  useGetAllHolidaysMutation,
+  useGetCalendarDataWithFiltersMutation,
+  useGetEventMutation,
+  useUpdateEventMutation,
+  useCreateEventMutation,
+  useDeleteEventMutation,
+  useGetCalendarMutation,
+  useUpdateCalendarMutation,
+  useCreateCalendarMutation,
+} = calendarsApiSlice;

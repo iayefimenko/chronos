@@ -5,6 +5,14 @@ import { Box, useMediaQuery, useTheme } from "@mui/material";
 import { useGetCalendarDataWithFiltersMutation } from "../features/calendars/calendarsApiSlice";
 import { useGetCalendarsQuery } from "../features/calendars/calendarsApiSlice";
 
+import {
+  setShouldUpdateEvents,
+  selectShouldUpdateEvents,
+} from "../features/calendars/calendarSlice";
+import { useDispatch, useSelector } from "react-redux";
+
+import { CalendarEdit } from "../components";
+
 const Welcome = () => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
@@ -20,32 +28,45 @@ const Welcome = () => {
   const [startAt, setStartAt] = useState();
   const [endAt, setEndAt] = useState();
 
-  const [events, setEvents] = useState([]);
+  const [currentCalendarData, setCurrentCalendarData] = useState({
+    events: [],
+  });
+  const [showHolidays, setShowHolidays] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editCalendar, setEditCalendar] = useState(false);
 
   const { data } = useGetCalendarsQuery();
 
   const [loadCalendarData] = useGetCalendarDataWithFiltersMutation();
 
+  const dispatch = useDispatch();
+  const shoudUpdateEvents = useSelector(selectShouldUpdateEvents);
+
+  const fetchData = async () => {
+    try {
+      const calendar = await loadCalendarData({
+        calendarId: currentCalendar.toString(),
+        filter: {
+          ...eventFilter,
+        },
+      }).unwrap();
+      setCurrentCalendarData(calendar.calendarData);
+    } catch (err) {
+      console.log(err);
+    }
+  };
   useEffect(() => {
     if (currentCalendar) {
-      const fetchData = async () => {
-        try {
-          console.log("ID", currentCalendar);
-          const calendar = await loadCalendarData({
-            calendarId: currentCalendar.toString(),
-            filter: {
-              ...eventFilter,
-            },
-          }).unwrap();
-          console.log("Loaded events:", calendar.calendarData.events);
-          setEvents(calendar.calendarData.events);
-        } catch (err) {
-          console.log(err);
-        }
-      };
       fetchData();
     }
   }, [currentCalendar, eventFilter]);
+
+  useEffect(() => {
+    if (shoudUpdateEvents) {
+      fetchData();
+      dispatch(setShouldUpdateEvents(false));
+    }
+  }, [shoudUpdateEvents]);
 
   useEffect(() => {
     setEventFilter({ ...eventFilter, startAt, endAt });
@@ -59,14 +80,27 @@ const Welcome = () => {
         setCurrentCalendar={setCurrentCalendar}
         eventFilter={eventFilter}
         setEventFilter={setEventFilter}
+        showHolidays={showHolidays}
+        setShowHolidays={setShowHolidays}
+        setIsEditModalOpen={setIsModalOpen}
+        setEditCalendar={setEditCalendar}
       />
       <Box flexGrow={1}>
         <CalendarView
-          events={events}
+          events={currentCalendarData?.events}
           setStartAt={setStartAt}
           setEndAt={setEndAt}
+          showHolidays={showHolidays}
+          currentCalendar={currentCalendar}
         />
       </Box>
+      <CalendarEdit
+        calendar={currentCalendarData}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+        edit={editCalendar}
+        setCurrentCalendarData={setCurrentCalendarData}
+      />
     </Box>
   );
 };

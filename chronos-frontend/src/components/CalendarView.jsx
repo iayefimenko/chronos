@@ -1,21 +1,80 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { Box } from "@mui/material";
+import { Box, Modal, Button } from "@mui/material";
 
-const CalendarView = ({ events, setStartAt, setEndAt }) => {
-  const [hintEvent, setHintEvent] = useState(null);
+import {
+  useGetHolidaysQuery,
+  useGetAllHolidaysMutation,
+} from "../features/calendars/calendarsApiSlice";
+import EventEdit from "./EventEdit";
+
+const CalendarView = ({
+  events,
+  setStartAt,
+  setEndAt,
+  showHolidays,
+  currentCalendar,
+}) => {
+  const [loadHolidays] = useGetAllHolidaysMutation();
+  const [holidays, setHolidays] = useState([]);
+  const [eventData, setEventData] = useState([]);
+
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleDatesSet = (dateInfo) => {
-    console.log(
-      "Visible range of dates changed:",
-      dateInfo.startStr,
-      dateInfo.endStr
-    );
     setStartAt(dateInfo.startStr);
     setEndAt(dateInfo.endStr);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const holidaysData = await loadHolidays().unwrap();
+        const mapped = holidaysData.holidays.map((h) => ({
+          title: h.name,
+          startAt: h.date,
+          endAt: h.date,
+          color: "#00ff11",
+        }));
+        setHolidays(mapped);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    if (showHolidays) {
+      setEventData([...events, ...holidays]);
+    } else {
+      setEventData([...events]);
+    }
+  }, [showHolidays, events]);
+
+  const handleEventClick = (clickInfo) => {
+    if (clickInfo.event._def.publicId !== "undefined") {
+      setSelectedEvent({
+        eventId: clickInfo.event._def.publicId,
+        calendarId: currentCalendar,
+      });
+      setIsModalOpen(true);
+    }
+  };
+
+  const handleDateClick = (arg) => {
+    if (arg.allDay && !arg.jsEvent.target.classList.contains("fc-event")) {
+      if (!currentCalendar) return;
+      setSelectedEvent({
+        eventId: null,
+        calendarId: currentCalendar,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   return (
@@ -31,7 +90,7 @@ const CalendarView = ({ events, setStartAt, setEndAt }) => {
           right: "dayGridMonth,timeGridWeek,timeGridDay",
         }}
         datesSet={handleDatesSet}
-        events={events.map((event) => ({
+        events={eventData.map((event) => ({
           id: event._id,
           description: event.description,
           title: event.title,
@@ -58,6 +117,14 @@ const CalendarView = ({ events, setStartAt, setEndAt }) => {
             </div>
           );
         }}
+        eventClick={handleEventClick}
+        dateClick={handleDateClick}
+      />
+      <EventEdit
+        currentEvent={selectedEvent}
+        setCurrentEvent={setSelectedEvent}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
       />
     </Box>
   );

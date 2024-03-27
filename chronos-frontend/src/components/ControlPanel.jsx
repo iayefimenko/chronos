@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   useMediaQuery,
@@ -13,8 +13,11 @@ import {
   Grid,
   Button,
 } from "@mui/material";
+
 import AddCardSharpIcon from "@mui/icons-material/AddCardSharp";
 import ModeEditOutlineSharpIcon from "@mui/icons-material/ModeEditOutlineSharp";
+
+import { EventEdit } from ".";
 
 const ControlPanel = ({
   calendars,
@@ -22,13 +25,29 @@ const ControlPanel = ({
   setCurrentCalendar,
   eventFilter,
   setEventFilter,
+  showHolidays,
+  setShowHolidays,
+  setIsEditModalOpen,
+  setEditCalendar,
 }) => {
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down("md"));
 
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleCalendarChange = (event) => {
-    console.log("Set Current value", event.target.v);
     setCurrentCalendar(event.target.value);
+  };
+
+  const handleAddEventBtnClick = () => {
+    if (currentCalendar) {
+      setSelectedEvent({
+        eventId: null,
+        calendarId: currentCalendar,
+      });
+      setIsModalOpen(true);
+    }
   };
 
   const handleCheckboxClicked = (event) => {
@@ -42,6 +61,8 @@ const ControlPanel = ({
         const newShow = eventFilter.show.filter((option) => option !== value);
         setEventFilter({ ...eventFilter, show: newShow });
       }
+    } else {
+      setShowHolidays(checked);
     }
   };
 
@@ -65,23 +86,33 @@ const ControlPanel = ({
         <Select
           value={currentCalendar}
           onChange={handleCalendarChange}
-          displayEmpty
           style={{ width: "80%", marginBottom: "20px" }}
         >
-          <MenuItem value="" disabled>
-            Select Current Calendar
-          </MenuItem>
           {calendars?.map((calendar) => (
             <MenuItem key={calendar.id} value={calendar._id}>
               {calendar.name}
             </MenuItem>
           ))}
         </Select>
+
         <Stack direction="column" justifyContent="center">
-          <IconButton>
+          <IconButton
+            onClick={() => {
+              //Create
+              setEditCalendar(false);
+              setIsEditModalOpen(true);
+            }}
+          >
             <AddCardSharpIcon />
           </IconButton>
-          <IconButton>
+          <IconButton
+            onClick={() => {
+              if (!currentCalendar) return;
+              //EDIT
+              setEditCalendar(true);
+              setIsEditModalOpen(true);
+            }}
+          >
             <ModeEditOutlineSharpIcon />
           </IconButton>
         </Stack>
@@ -101,6 +132,7 @@ const ControlPanel = ({
               color="primary"
               value="holidays"
               onChange={handleCheckboxClicked}
+              checked={showHolidays}
             />
             <Typography fontSize={15}>Holidays</Typography>
           </Stack>
@@ -141,7 +173,20 @@ const ControlPanel = ({
         sx={{ mt: 3, mb: 3, backgroundColor: "gray" }}
         flexItem
       />
-      <Button variant="contained">Create Event</Button>
+      <Button
+        variant="contained"
+        onClick={handleAddEventBtnClick}
+        disabled={!currentCalendar}
+      >
+        Create Event
+      </Button>
+
+      <EventEdit
+        currentEvent={selectedEvent}
+        setCurrentEvent={setSelectedEvent}
+        isOpen={isModalOpen}
+        setIsOpen={setIsModalOpen}
+      />
     </Box>
   );
 };
