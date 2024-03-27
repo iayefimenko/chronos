@@ -17,7 +17,7 @@ import {
 import AddCardSharpIcon from "@mui/icons-material/AddCardSharp";
 import ModeEditOutlineSharpIcon from "@mui/icons-material/ModeEditOutlineSharp";
 
-import { EventEdit } from ".";
+import { EventEdit, UserBlock } from ".";
 
 const ControlPanel = ({
   calendars,
@@ -180,6 +180,15 @@ const ControlPanel = ({
       >
         Create Event
       </Button>
+
+      <Divider
+        orientation="horizontal"
+        sx={{ mt: 3, mb: 3, backgroundColor: "gray" }}
+        flexItem
+      />
+      <Box>
+        <UserBlock />
+      </Box>
 
       <EventEdit
         currentEvent={selectedEvent}

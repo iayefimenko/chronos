@@ -17,14 +17,12 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     try {
-      const userData = await login({ email, password }).unwrap();
-      console.log("User data", userData);
-      dispatch(setCredentials({ ...userData }));
+      const data = await login({ email, password }).unwrap();
+      dispatch(setCredentials({ ...data }));
       setEmail("");
       setPassword("");
       navigate("/welcome");
     } catch (err) {
-      // handle errors
       console.log(err);
     }
   };

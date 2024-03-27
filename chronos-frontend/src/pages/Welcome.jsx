@@ -3,12 +3,15 @@ import { ControlPanel, CalendarView } from "../components";
 import { Box, useMediaQuery, useTheme } from "@mui/material";
 
 import { useGetCalendarDataWithFiltersMutation } from "../features/calendars/calendarsApiSlice";
-import { useGetCalendarsQuery } from "../features/calendars/calendarsApiSlice";
+import { useGetAllCalendarsMutation } from "../features/calendars/calendarsApiSlice";
+import { useGetMeMutation } from "../features/user/userApiSlice";
 
 import {
   setShouldUpdateEvents,
   selectShouldUpdateEvents,
 } from "../features/calendars/calendarSlice";
+
+import { setUser } from "../features/auth/authSlice";
 import { useDispatch, useSelector } from "react-redux";
 
 import { CalendarEdit } from "../components";
@@ -35,12 +38,31 @@ const Welcome = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editCalendar, setEditCalendar] = useState(false);
 
-  const { data } = useGetCalendarsQuery();
-
+  const [calendarsData, setCalendarsData] = useState(null);
   const [loadCalendarData] = useGetCalendarDataWithFiltersMutation();
+  const [loadCalendarList] = useGetAllCalendarsMutation();
+  const [loadMe] = useGetMeMutation();
 
   const dispatch = useDispatch();
   const shoudUpdateEvents = useSelector(selectShouldUpdateEvents);
+
+  const fetchCalendarsList = async () => {
+    try {
+      const response = await loadCalendarList().unwrap();
+      setCalendarsData(response);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const fetchMe = async () => {
+    try {
+      const me = await loadMe().unwrap();
+      dispatch(setUser(me.user));
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   const fetchData = async () => {
     try {
@@ -59,8 +81,12 @@ const Welcome = () => {
     if (currentCalendar) {
       fetchData();
     }
-  }, [currentCalendar, eventFilter]);
+  }, [currentCalendar, eventFilter, calendarsData]);
 
+  useEffect(() => {
+    fetchCalendarsList();
+    fetchMe();
+  }, []);
   useEffect(() => {
     if (shoudUpdateEvents) {
       fetchData();
@@ -75,7 +101,7 @@ const Welcome = () => {
   return (
     <Box display="flex" flexDirection={isSmallScreen ? "column" : "row"}>
       <ControlPanel
-        calendars={data?.calendars}
+        calendars={calendarsData?.calendars}
         currentCalendar={currentCalendar}
         setCurrentCalendar={setCurrentCalendar}
         eventFilter={eventFilter}
@@ -99,7 +125,9 @@ const Welcome = () => {
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
         edit={editCalendar}
-        setCurrentCalendarData={setCurrentCalendarData}
+        calendarsList={calendarsData}
+        setCalendarsList={setCalendarsData}
+        setCurrentCalendar={setCurrentCalendar}
       />
     </Box>
   );

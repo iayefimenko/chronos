@@ -62,6 +62,30 @@ const updateCalendar = async (id, calendarData) => {
   }
 };
 
+const deleteCalendar = async (calendarId) => {
+  const error = {
+    statusCode: HttpStatus.METHOD_NOT_ALLOWED,
+    message: "",
+  };
+  try {
+    const calendar = await Calendar.findById(calendarId);
+
+    if (!calendar || calendar.isDefault) throw error;
+
+    for (const eventId of calendar.events) {
+      await Event.findByIdAndDelete(eventId);
+    }
+
+    for (const calendarUserId of calendar.calendarUsers) {
+      await CalendarUser.findByIdAndDelete(calendarUserId);
+    }
+
+    await Calendar.findByIdAndDelete(calendarId);
+  } catch (err) {
+    throw err;
+  }
+};
+
 const createEvent = async (calendarId, userId, eventData) => {
   try {
     let event = new Event({
@@ -290,6 +314,7 @@ module.exports = {
   createCalendar,
   getMyCalendars,
   updateCalendar,
+  deleteCalendar,
   createEvent,
   updateEvent,
   getEvent,

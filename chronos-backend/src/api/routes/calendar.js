@@ -17,6 +17,8 @@ router.post(
   calendarController.createCalendar
 );
 
+router.delete("/:id", calendarGuard, calendarController.deleteCalendar);
+
 router.patch(
   "/:id",
   validate(cSchema.UpdateCalendar),

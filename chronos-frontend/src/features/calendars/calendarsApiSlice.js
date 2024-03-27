@@ -5,6 +5,13 @@ export const calendarsApiSlice = apiSlice.injectEndpoints({
     getCalendars: builder.query({
       query: () => "/calendars",
     }),
+
+    getAllCalendars: builder.mutation({
+      query: () => ({
+        url: `/calendars`,
+        method: "GET",
+      }),
+    }),
     getCalendarDataWithFilters: builder.mutation({
       query: ({ calendarId, filter }) => ({
         url: `/calendars/${calendarId}/receive-events`,
@@ -33,6 +40,13 @@ export const calendarsApiSlice = apiSlice.injectEndpoints({
         url: `/calendars`,
         method: "POST",
         body: { ...calendarData },
+      }),
+    }),
+
+    deleteCalendar: builder.mutation({
+      query: ({ calendarId }) => ({
+        url: `/calendars/${calendarId}`,
+        method: "DELETE",
       }),
     }),
 
@@ -86,4 +100,6 @@ export const {
   useGetCalendarMutation,
   useUpdateCalendarMutation,
   useCreateCalendarMutation,
+  useGetAllCalendarsMutation,
+  useDeleteCalendarMutation,
 } = calendarsApiSlice;

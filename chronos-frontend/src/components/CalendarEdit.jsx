@@ -17,14 +17,19 @@ import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import {
   useUpdateCalendarMutation,
   useCreateCalendarMutation,
+  useDeleteCalendarMutation,
 } from "../features/calendars/calendarsApiSlice";
+
+import ConfirmationDialog from "./ConfirmationDialog";
 
 const CalendarEdit = ({
   calendar,
   isOpen,
   setIsOpen,
   edit,
-  setCurrentCalendarData,
+  calendarsList,
+  setCalendarsList,
+  setCurrentCalendar,
 }) => {
   const handleCloseModal = () => {
     setIsOpen(false);
@@ -36,6 +41,7 @@ const CalendarEdit = ({
   };
 
   const [calendarData, setCalendarData] = useState(initialState);
+  const [showConfirm, setShowConfirm] = useState(false);
 
   useEffect(() => {
     if (edit) {
@@ -52,11 +58,10 @@ const CalendarEdit = ({
 
   const [createCalendar] = useCreateCalendarMutation();
   const [updateCalendar] = useUpdateCalendarMutation();
+  const [deleteCalendar] = useDeleteCalendarMutation();
 
   const handleSubmit = async () => {
     const { name, description } = calendarData;
-
-    console.log("Handle save", calendarData);
     if (name < 4) {
       setNameError(true);
     } else if (description.length > 0 && description.length < 16) {
@@ -82,8 +87,34 @@ const CalendarEdit = ({
       } catch (err) {
         console.log(err);
       }
-      setCurrentCalendarData({ ...calendar, name, description });
+
+      const calendarToUpdate = calendarsList.calendars.findIndex(
+        (c) => c._id === calendar._id
+      );
+      if (calendarToUpdate !== -1) {
+        const updatedCalendars = [...calendarsList.calendars];
+        updatedCalendars[calendarToUpdate] = {
+          ...updatedCalendars[calendarToUpdate],
+          name,
+          description,
+        };
+        setCalendarsList({ ...calendarsList, calendars: updatedCalendars });
+      }
       handleCloseModal();
+    }
+  };
+
+  const handleDeleteCalendar = async () => {
+    try {
+      await deleteCalendar({ calendarId: calendar._id }).unwrap();
+      const updatedList = calendarsList.calendars.filter(
+        (c) => c._id !== calendar._id
+      );
+      setCalendarsList({ ...calendarsList, calendars: updatedList });
+      setCurrentCalendar(updatedList[0]);
+      handleCloseModal();
+    } catch (err) {
+      console.log(err);
     }
   };
   return (
@@ -113,7 +144,7 @@ const CalendarEdit = ({
           {edit && !calendar.isDefault && (
             <IconButton
               sx={{ verticalAlign: "middle" }}
-              //   onClick={() => setShowConfirm(true)}
+              onClick={() => setShowConfirm(true)}
             >
               <DeleteOutlineIcon sx={{ color: "red", fontSize: "1.5rem" }} />
             </IconButton>
@@ -168,6 +199,16 @@ const CalendarEdit = ({
             Close
           </Button>
         </Stack>
+        {showConfirm && (
+          <ConfirmationDialog
+            text="Do you really want to delete this calendar?"
+            onClose={() => setShowConfirm(false)}
+            onConfirm={() => {
+              setShowConfirm(false);
+              handleDeleteCalendar();
+            }}
+          />
+        )}
       </Box>
     </Modal>
   );

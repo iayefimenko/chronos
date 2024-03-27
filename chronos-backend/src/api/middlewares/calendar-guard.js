@@ -12,15 +12,16 @@ async function calendarGuard(req, res, next) {
   const calendar = await Calendar.findById(req.params.id).populate(
     "calendarUsers"
   );
-  if (!calendar) res.sendStatus(HttpStatus.FORBIDDEN);
-
-  const me = calendar.calendarUsers.find(
-    (m) => m.user._id.toString() === userId
-  );
-  if (!me) return res.sendStatus(HttpStatus.FORBIDDEN);
-  req.calendarMember = me;
-
-  next();
+  if (calendar === null || calendar.calendarUsers === null)
+    res.sendStatus(HttpStatus.FORBIDDEN);
+  else {
+    const me = calendar.calendarUsers.find(
+      (m) => m.user._id.toString() === userId
+    );
+    if (!me) return res.sendStatus(HttpStatus.FORBIDDEN);
+    req.calendarMember = me;
+    next();
+  }
 }
 
 module.exports = { calendarGuard };

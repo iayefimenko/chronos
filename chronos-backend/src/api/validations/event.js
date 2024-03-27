@@ -18,6 +18,8 @@ const UpdateEvent = Joi.object({
   description: Joi.string().min(16).max(200),
   color: Joi.string().regex(colorRegex),
   startAt: Joi.date().iso().less(Joi.ref("endAt")),
+  type: Joi.string()
+  .valid(...EVENT_TYPES),
   endAt: Joi.date().iso(),
 });
 

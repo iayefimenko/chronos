@@ -157,6 +157,17 @@ const deleteCalendarUser = async (req, res, next) => {
   }
 };
 
+const deleteCalendar = async (req, res, next) => {
+  if (req.calendarMember.role !== "owner")
+    return res.status(HttpStatus.FORBIDDEN);
+  try {
+    await calendarService.deleteCalendar(req.params.id);
+    return res.status(HttpStatus.OK).json({});
+  } catch (err) {
+    next(err);
+  }
+};
+
 module.exports = {
   getMyCalendars,
   createCalendar,
@@ -170,4 +181,5 @@ module.exports = {
   inviteUser,
   confirmUserJoin,
   deleteCalendarUser,
+  deleteCalendar,
 };
