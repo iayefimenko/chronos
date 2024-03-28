@@ -8,22 +8,30 @@ import {
   MenuItem,
   FormControl,
   InputLabel,
+  Divider,
   Typography,
   Stack,
   IconButton,
 } from "@mui/material";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import PersonAddAltIcon from "@mui/icons-material/PersonAddAlt";
 
 import {
   useUpdateCalendarMutation,
   useCreateCalendarMutation,
   useDeleteCalendarMutation,
+  useInviteToCalendarMutation,
 } from "../features/calendars/calendarsApiSlice";
 
 import ConfirmationDialog from "./ConfirmationDialog";
+import InfoHint from "./InfoHint";
+
+import { CalendarUserView } from ".";
 
 const CalendarEdit = ({
   calendar,
+  setCalendar,
+  currentUserRole,
   isOpen,
   setIsOpen,
   edit,
@@ -42,6 +50,9 @@ const CalendarEdit = ({
 
   const [calendarData, setCalendarData] = useState(initialState);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [showInfoHint, setShowInfoHint] = useState(false);
+  const [invUserEmail, setInvUserEmail] = useState("");
+  const [invUserEmailError, setInvUserEmailError] = useState(false);
 
   useEffect(() => {
     if (edit) {
@@ -52,13 +63,19 @@ const CalendarEdit = ({
     } else {
       setCalendarData(initialState);
     }
+
+    console.log("Edit calendar", calendar, currentUserRole);
   }, [isOpen]);
   const [nameError, setNameError] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
+  //const []
 
   const [createCalendar] = useCreateCalendarMutation();
   const [updateCalendar] = useUpdateCalendarMutation();
   const [deleteCalendar] = useDeleteCalendarMutation();
+  const [inviteUser] = useInviteToCalendarMutation();
+
+  const EMAIL_REGEX = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
 
   const handleSubmit = async () => {
     const { name, description } = calendarData;
@@ -117,6 +134,24 @@ const CalendarEdit = ({
       console.log(err);
     }
   };
+
+  const handleAddUser = async () => {
+    if (!EMAIL_REGEX.test(invUserEmail)) {
+      setInvUserEmailError(true);
+    } else {
+      try {
+        await inviteUser({
+          calendarId: calendar._id,
+          data: { email: invUserEmail },
+        }).unwrap();
+        setInvUserEmail("");
+        setShowInfoHint(true);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+  };
+
   return (
     <Modal open={isOpen} hideBackdrop={true}>
       <Box
@@ -181,6 +216,73 @@ const CalendarEdit = ({
           />
         </Stack>
 
+        {edit && (
+          <Stack direction="column">
+            <Divider
+              orientation="horizontal"
+              sx={{ backgroundColor: "gray" }}
+              flexItem
+            />
+            <Typography variant="h4" m={1}>
+              Users
+            </Typography>
+            <Box
+              sx={{
+                maxHeight: 200,
+                overflow: "auto",
+                mb: 2,
+              }}
+            >
+              {calendar?.calendarUsers.map((item, index) => (
+                <CalendarUserView
+                  displayFor={currentUserRole}
+                  data={calendar.calendarUsers[index]}
+                  calendar={calendar}
+                  setCalendar={setCalendar}
+                />
+              ))}
+            </Box>
+            <Divider
+              orientation="horizontal"
+              sx={{ mb: "10px", backgroundColor: "gray" }}
+              flexItem
+            />
+
+            {currentUserRole === "owner" && (
+              <Box>
+                <Typography variant="h4">Invite User</Typography>
+                <Stack
+                  direction="row"
+                  mt={2}
+                  mb={2}
+                  justifyContent="space-between"
+                >
+                  <TextField
+                    fullWidth
+                    placeholder="Email"
+                    type="email"
+                    value={invUserEmail}
+                    error={invUserEmailError}
+                    helperText={invUserEmailError ? "Not valid email" : ""}
+                    onChange={(e) => {
+                      setInvUserEmail(e.target.value);
+                      setInvUserEmailError(!EMAIL_REGEX.test(invUserEmail));
+                    }}
+                  />
+                  <IconButton
+                    sx={{ verticalAlign: "middle" }}
+                    onClick={() => handleAddUser()}
+                  >
+                    <PersonAddAltIcon
+                      sx={{ color: "green", fontSize: "2.0rem" }}
+                    />
+                  </IconButton>
+                </Stack>
+              </Box>
+            )}
+          </Stack>
+        )}
+
         <Stack direction="row" justifyContent="center" spacing={5}>
           <Button
             variant="contained"
@@ -207,6 +309,12 @@ const CalendarEdit = ({
               setShowConfirm(false);
               handleDeleteCalendar();
             }}
+          />
+        )}
+        {showInfoHint && (
+          <InfoHint
+            text="You successfully invited user to calendar"
+            onClose={() => setShowInfoHint(false)}
           />
         )}
       </Box>

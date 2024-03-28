@@ -1,22 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TextField, Button, Typography, Container, Grid } from "@mui/material";
 
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
 import { useLoginMutation } from "../features/auth/authApiSlice";
+import { useComfirmUserJoinMutation } from "../features/calendars/calendarsApiSlice";
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 // import "../forms.css";
 import calendarGif from "../assets/calendar.gif";
 
 const Login = () => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const [login] = useLoginMutation();
+  const [confirmJoin] = useComfirmUserJoinMutation();
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = queryParams.get("token");
+    if (token) {
+      sessionStorage.setItem("inviteToCalendarToken", token);
+    }
+    queryParams.delete("token");
+    const newUrl = `${window.location.pathname}?${queryParams.toString()}`;
+    window.history.replaceState({}, "", newUrl);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -27,6 +42,17 @@ const Login = () => {
       dispatch(setCredentials({ ...userData }));
       setEmail("");
       setPassword("");
+
+      const inviteToken = sessionStorage.getItem("inviteToCalendarToken");
+      if (inviteToken && inviteToken !== "null") {
+        try {
+          await confirmJoin({ data: { token: inviteToken } }).unwrap();
+        } catch (err) {
+          console.log(err);
+        }
+        sessionStorage.setItem("inviteToCalendarToken", "null");
+      }
+
       navigate("/welcome");
     } catch (err) {
       // handle errors

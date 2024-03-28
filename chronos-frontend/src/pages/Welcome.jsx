@@ -34,6 +34,7 @@ const Welcome = () => {
   const [currentCalendarData, setCurrentCalendarData] = useState({
     events: [],
   });
+  const [calendarUserRole, setCalendarUserRole] = useState();
   const [showHolidays, setShowHolidays] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editCalendar, setEditCalendar] = useState(false);
@@ -73,6 +74,7 @@ const Welcome = () => {
         },
       }).unwrap();
       setCurrentCalendarData(calendar.calendarData);
+      setCalendarUserRole(calendar.me);
     } catch (err) {
       console.log(err);
     }
@@ -122,6 +124,8 @@ const Welcome = () => {
       </Box>
       <CalendarEdit
         calendar={currentCalendarData}
+        setCalendar={setCurrentCalendarData}
+        currentUserRole={calendarUserRole}
         isOpen={isModalOpen}
         setIsOpen={setIsModalOpen}
         edit={editCalendar}

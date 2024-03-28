@@ -11,6 +11,7 @@ const {
   INVITE_TO_CALENDAR_TEMPLATE,
 } = require("../helpers/email-helper");
 const { jwtVerifyAsync } = require("../helpers/jwt-helper");
+const logger = require("../../config/logger");
 
 const invTokens = new Map();
 

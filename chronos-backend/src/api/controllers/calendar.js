@@ -96,11 +96,14 @@ const deleteEvent = async (req, res, next) => {
 
 const getEvents = async (req, res, next) => {
   try {
-    const calendarData = await calendarService.getCalendar(
+    let calendarData = await calendarService.getCalendar(
       req.params.id,
       req.body
     );
-    return res.status(HttpStatus.OK).json({ calendarData });
+
+    return res
+      .status(HttpStatus.OK)
+      .json({ calendarData, me: req.calendarMember.role });
   } catch (err) {
     next(err);
   }

@@ -27,6 +27,30 @@ export const calendarsApiSlice = apiSlice.injectEndpoints({
       }),
     }),
 
+    inviteToCalendar: builder.mutation({
+      query: ({ calendarId, data }) => ({
+        url: `/calendars/${calendarId}/inite`,
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+
+    comfirmUserJoin: builder.mutation({
+      query: ({ data }) => ({
+        url: "/calendars/confirm-join",
+        method: "POST",
+        body: { ...data },
+      }),
+    }),
+
+    deleteUserFromCalendar: builder.mutation({
+      query: ({ calendarId, data }) => ({
+        url: `/calendars/${calendarId}/delete-user`,
+        method: "DELETE",
+        body: { ...data },
+      }),
+    }),
+
     updateCalendar: builder.mutation({
       query: ({ calendarId, calendarData }) => ({
         url: `/calendars/${calendarId}`,
@@ -102,4 +126,7 @@ export const {
   useCreateCalendarMutation,
   useGetAllCalendarsMutation,
   useDeleteCalendarMutation,
+  useInviteToCalendarMutation,
+  useComfirmUserJoinMutation,
+  useDeleteUserFromCalendarMutation,
 } = calendarsApiSlice;
