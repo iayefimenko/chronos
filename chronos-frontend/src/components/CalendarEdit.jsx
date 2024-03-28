@@ -192,6 +192,7 @@ const CalendarEdit = ({
             fullWidth
             value={calendarData.name}
             inputProps={{ maxLength: 100 }}
+            disabled={currentUserRole !== "owner"}
             error={nameError}
             helperText={nameError ? "Name can't have less than 4 chars" : ""}
             onChange={(e) => {
@@ -205,6 +206,7 @@ const CalendarEdit = ({
             value={calendarData.description}
             inputProps={{ maxLength: 200 }}
             error={descriptionError}
+            disabled={currentUserRole !== "owner"}
             helperText={
               descriptionError
                 ? "Description can't have less than 16 chars"
@@ -289,6 +291,7 @@ const CalendarEdit = ({
             color="info"
             onClick={handleSubmit}
             sx={{ width: "50%" }}
+            disabled={currentUserRole !== "owner"}
           >
             Save
           </Button>

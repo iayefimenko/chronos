@@ -5,10 +5,7 @@ import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { Box, Modal, Button } from "@mui/material";
 
-import {
-  useGetHolidaysQuery,
-  useGetAllHolidaysMutation,
-} from "../features/calendars/calendarsApiSlice";
+import { useGetAllHolidaysMutation } from "../features/calendars/calendarsApiSlice";
 import EventEdit from "./EventEdit";
 
 const CalendarView = ({
@@ -17,6 +14,7 @@ const CalendarView = ({
   setEndAt,
   showHolidays,
   currentCalendar,
+  calendarUserRole,
 }) => {
   const [loadHolidays] = useGetAllHolidaysMutation();
   const [holidays, setHolidays] = useState([]);
@@ -61,6 +59,7 @@ const CalendarView = ({
       setSelectedEvent({
         eventId: clickInfo.event._def.publicId,
         calendarId: currentCalendar,
+        userRole: calendarUserRole,
       });
       setIsModalOpen(true);
     }
@@ -72,6 +71,7 @@ const CalendarView = ({
       setSelectedEvent({
         eventId: null,
         calendarId: currentCalendar,
+        date: arg.date,
       });
       setIsModalOpen(true);
     }

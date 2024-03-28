@@ -19,7 +19,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import * as dayjs from "dayjs";
 
 import { setShouldUpdateEvents } from "../features/calendars/calendarSlice";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 
 import {
   useGetEventMutation,
@@ -27,6 +27,8 @@ import {
   useCreateEventMutation,
   useDeleteEventMutation,
 } from "../features/calendars/calendarsApiSlice";
+
+import { selectCurrentUser } from "../features/auth/authSlice";
 
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 
@@ -40,6 +42,8 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
     setIsOpen(false);
   };
 
+  const me = useSelector(selectCurrentUser);
+
   const isEdit = currentEvent?.eventId ? true : false;
   const today = new Date();
   const initialEventData = {
@@ -47,14 +51,15 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
     description: "",
     type: "arrangement",
     color: "#ff0000",
-    startAt: today.toISOString(),
-    endAt: today.toISOString(),
+    startAt: currentEvent?.date || today.toISOString(),
+    endAt: currentEvent?.date || today.toISOString(),
   };
   const [eventData, setEventData] = useState();
 
   const [titleError, setTitleError] = useState(false);
   const [descriptionError, setDescriptionError] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [hasPermissionToEdit, setHasPermisionToEdit] = useState();
 
   const [loadEventInfo] = useGetEventMutation();
   const [updateEvent] = useUpdateEventMutation();
@@ -70,12 +75,19 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
             calendarId: currentEvent.calendarId,
             eventId: currentEvent.eventId,
           }).unwrap();
+
+          setHasPermisionToEdit(
+            eventData.event.creator._id === me._id ||
+              currentEvent.userRole === "owner"
+          );
           setEventData(eventData.event);
         } catch (err) {
           console.log(err);
         }
       };
       fetchData();
+    } else {
+      setHasPermisionToEdit(true);
     }
   }, [isOpen, isEdit]);
 
@@ -90,7 +102,6 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
       if (type === "reminder") description = "Default description";
       if (type !== "arrangement") {
         const startDate = new Date(startAt);
-        console.log("Start date is", startDate);
         startDate.setHours(startDate.getHours() + 1);
         endAt = startDate.toISOString();
       }
@@ -152,7 +163,15 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
           <Typography variant="h4" gutterBottom>
             {isEdit ? "Edit event" : "Create Event"}
           </Typography>
+
           {isEdit && (
+            <Typography>{`Created by: ${
+              me._id === eventData?.creator?._id
+                ? "ME"
+                : eventData?.creator?.email
+            }`}</Typography>
+          )}
+          {isEdit && hasPermissionToEdit && (
             <IconButton
               sx={{ verticalAlign: "middle" }}
               onClick={() => setShowConfirm(true)}
@@ -164,7 +183,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
 
         {eventData && (
           <Stack spacing={2}>
-            <FormControl fullWidth>
+            <FormControl fullWidth disabled={!hasPermissionToEdit}>
               <InputLabel htmlFor="event-type">Event Type</InputLabel>
               <Select
                 value={eventData.type}
@@ -181,6 +200,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
             </FormControl>
             <TextField
               label="Title"
+              disabled={!hasPermissionToEdit}
               fullWidth
               value={eventData.title}
               inputProps={{ maxLength: 100 }}
@@ -196,6 +216,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
             {eventData.type !== "reminder" && (
               <TextField
                 label="Description"
+                disabled={!hasPermissionToEdit}
                 fullWidth
                 multiline
                 rows={4}
@@ -216,6 +237,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
 
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateTimePicker
+                disabled={!hasPermissionToEdit}
                 label="Start At"
                 value={dayjs(eventData.startAt)}
                 onChange={(newValue) =>
@@ -228,6 +250,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
               />
               {eventData.type === "arrangement" && (
                 <DateTimePicker
+                  disabled={!hasPermissionToEdit}
                   label="End At"
                   value={dayjs(eventData.endAt)}
                   onChange={(newValue) =>
@@ -246,6 +269,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
 
             <input
               type="color"
+              disabled={!hasPermissionToEdit}
               value={eventData.color}
               onChange={(e) =>
                 setEventData({ ...eventData, color: e.target.value })
@@ -254,6 +278,7 @@ const EventEdit = ({ currentEvent, setCurrentEvent, isOpen, setIsOpen }) => {
             />
             <Stack direction="row" justifyContent="center" spacing={5}>
               <Button
+                disabled={!hasPermissionToEdit}
                 variant="contained"
                 color="info"
                 onClick={handleEventSubmit}

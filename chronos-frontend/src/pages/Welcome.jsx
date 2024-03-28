@@ -74,6 +74,7 @@ const Welcome = () => {
         },
       }).unwrap();
       setCurrentCalendarData(calendar.calendarData);
+      console.log("Calendar data was loaded, role ", calendar.me);
       setCalendarUserRole(calendar.me);
     } catch (err) {
       console.log(err);
@@ -120,6 +121,7 @@ const Welcome = () => {
           setEndAt={setEndAt}
           showHolidays={showHolidays}
           currentCalendar={currentCalendar}
+          calendarUserRole={calendarUserRole}
         />
       </Box>
       <CalendarEdit

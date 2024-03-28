@@ -135,7 +135,10 @@ const updateEvent = async (eventId, calendarMember, eventData) => {
 };
 
 const getEvent = async (id) => {
-  return await Event.findById(id);
+  return await Event.findById(id).populate({
+    path: "creator",
+    select: "-password",
+  });
 };
 
 const deleteEvent = async (calendarId, eventId, calendarMember) => {
