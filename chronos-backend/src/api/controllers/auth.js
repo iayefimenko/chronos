@@ -26,7 +26,7 @@ const login = async (req, res, next) => {
 const verifyEmail = (req, res, next) => {
   try {
     authService.verifyEmail(req.body.token);
-    return res.sendStatus(HttpStatus.OK);
+    return res.status(HttpStatus.OK).json({});
   } catch (err) {
     next(err);
   }
