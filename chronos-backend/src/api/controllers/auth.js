@@ -40,8 +40,8 @@ const refreshToken = async (req, res, next) => {
       .json({ message: "Refresh token was not found" });
 
   try {
-    const acessToken = await authService.refreshToken(refreshT);
-    return res.status(HttpStatus.CREATED).json({ acessToken });
+    const accessToken = await authService.refreshToken(refreshT);
+    return res.status(HttpStatus.CREATED).json({ accessToken });
   } catch (err) {
     next(err);
   }

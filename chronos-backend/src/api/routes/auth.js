@@ -26,7 +26,7 @@ router.post(
   authController.confirmPasswordReset
 );
 
-router.post("/refresh-token", authController.refreshToken);
+router.get("/refresh-token", authController.refreshToken);
 router.post("/logout", authController.logout);
 
 module.exports = router;
