@@ -1,12 +1,19 @@
 import { useEffect, useState } from "react";
-import { TextField, Button, Typography, Container, Grid } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Container,
+  Grid,
+  Link,
+} from "@mui/material";
 
 import { useDispatch } from "react-redux";
 import { setCredentials } from "../features/auth/authSlice";
 import { useLoginMutation } from "../features/auth/authApiSlice";
 import { useComfirmUserJoinMutation } from "../features/calendars/calendarsApiSlice";
 
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, Link as RouterLink } from "react-router-dom";
 
 // import "../forms.css";
 import calendarGif from "../assets/calendar.gif";
@@ -110,6 +117,7 @@ const Login = () => {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </Grid>
+
             <Grid item>
               <Button
                 variant="contained"
@@ -119,6 +127,22 @@ const Login = () => {
               >
                 Sign In
               </Button>
+            </Grid>
+            <Grid item>
+              <Typography variant="body1" align="center">
+                Don't have an account?{" "}
+                <Link component={RouterLink} to="/signup">
+                  Sign up
+                </Link>
+              </Typography>
+            </Grid>
+            <Grid item>
+              <Typography variant="body1" align="center">
+                Forgot password{" "}
+                <Link component={RouterLink} to="/forgot-password">
+                  Click here
+                </Link>
+              </Typography>
             </Grid>
           </Grid>
         </Grid>

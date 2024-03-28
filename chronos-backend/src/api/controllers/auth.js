@@ -49,13 +49,13 @@ const refreshToken = async (req, res, next) => {
 
 const resetPassword = async (req, res, next) => {
   await authService.resetPassword(req.body.email);
-  return res.sendStatus(HttpStatus.OK);
+  return res.status(HttpStatus.OK).json({});
 };
 
 const confirmPasswordReset = async (req, res, next) => {
   try {
     await authService.confirmPasswordReset(req.body);
-    return res.sendStatus(HttpStatus.OK);
+    return res.status(HttpStatus.OK).json({});
   } catch (err) {
     next(err);
   }
@@ -66,7 +66,7 @@ const logout = (req, res, next) => {
   res.clearCookie("refreshToken", { httpOnly: true });
 
   if (refreshToken) authService.logout(refreshToken);
-  return res.sendStatus(HttpStatus.OK);
+  return res.status(HttpStatus.OK).json({});
 };
 
 module.exports = {
